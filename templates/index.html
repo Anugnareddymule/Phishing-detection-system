@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛡️ Phishing & Plagiarism Detection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: #f5f5f5;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #e0e0e0;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            background: #f8f9ff;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-label:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .url-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 15px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .status-safe {
+            background: #4caf50;
+            color: white;
+        }
+
+        .status-suspicious {
+            background: #ff9800;
+            color: white;
+        }
+
+        .status-phishing {
+            background: #f44336;
+            color: white;
+        }
+
+        .risk-score {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .risk-low {
+            color: #4caf50;
+        }
+
+        .risk-medium {
+            color: #ff9800;
+        }
+
+        .risk-high {
+            color: #f44336;
+        }
+
+        .info-card {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .risk-factor {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .url-display {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            word-break: break-all;
+            font-family: monospace;
+            margin: 15px 0;
+        }
+
+        .highlight-plag {
+            background-color: #ffeb3b;
+            font-weight: bold;
+            color: black;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .highlight-phish {
+            background-color: #f44336;
+            font-weight: bold;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        pre {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-x: auto;
+            max-height: 500px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #c62828;
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #2e7d32;
+        }
+
+        h2, h3 {
+            color: #333;
+            margin: 20px 0 10px 0;
+        }
+
+        .domain-info {
+            display: inline-block;
+            background: #e3f2fd;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin: 10px 5px;
+            font-weight: 600;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PHISHING DETECTION SYSTEM</h1>
+            <p>Detect phishing URLs and analyze documents for suspicious content</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('file')">📄 File Analysis</button>
+            <button class="tab" onclick="switchTab('url')">🔗 URL Scanner</button>
+        </div>
+
+        <div id="fileTab" class="tab-content active">
+            <div class="upload-area">
+                <h3>📁 Upload Document</h3>
+                <p style="margin: 10px 0; color: #666;">Upload a PDF or TXT file to scan for phishing and plagiarism</p>
+                <form id="uploadForm">
+                    <label for="fileInput" class="file-label">Choose File</label>
+                    <input type="file" id="fileInput" accept=".pdf,.txt" required>
+                    <p id="fileName" style="margin-top: 15px; color: #667eea;"></p>
+                    <button type="submit" style="margin-top: 15px;">Analyze Document</button>
+                </form>
+            </div>
+            <div class="results" id="fileResults"></div>
+        </div>
+
+        <div id="urlTab" class="tab-content">
+            <div class="upload-area">
+                <h3>🔍 Check URL for Phishing</h3>
+                <p style="margin: 10px 0; color: #666;">Enter a website URL to check if it's safe or potentially dangerous</p>
+                <div class="url-input-group">
+                    <input type="text" id="urlInput" placeholder="Enter URL (e.g., example.com or https://example.com)">
+                    <button onclick="analyzeURL()">Scan URL</button>
+                </div>
+            </div>
+            <div class="results" id="urlResults"></div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            if (tab === 'file') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('fileTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('urlTab').classList.add('active');
+            }
+        }
+
+        // File upload handling
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) {
+                fileName.textContent = `Selected: ${e.target.files[0].name}`;
+            }
+        });
+
+        const uploadForm = document.getElementById('uploadForm');
+        const fileResults = document.getElementById('fileResults');
+
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fileResults.innerHTML = "<div class='loading'>🔍 Analyzing document... Please wait...</div>";
+
+            try {
+                const res = await fetch('/analyze', { method: 'POST', body: formData });
+                const data = await res.json();
+
+                if (data.error) {
+                    fileResults.innerHTML = `<div class="error">❌ ${data.error}</div>`;
+                    return;
+                }
+
+                let highlightedText = data.text;
+
+                data.flaggedSections.forEach(section => {
+                    const safeSnippet = section.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(safeSnippet, 'gi');
+                    highlightedText = highlightedText.replace(regex, `<span class="highlight-plag">${section.text}</span>`);
+                });
+
+                data.urgencyWords.forEach(word => {
+                    const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                    highlightedText = highlightedText.replace(regex, `<span class="highlight-phish">${word}</span>`);
+                });
+
+                const riskClass = data.riskScore >= 60 ? 'risk-high' : data.riskScore >= 30 ? 'risk-medium' : 'risk-low';
+
+                fileResults.innerHTML = `
+                    <h2>📊 Analysis Report: ${data.fileName}</h2>
+                    <div class="risk-score ${riskClass}">${data.riskScore}/100</div>
+                    
+                    <div class="info-card">
+                        <h3>🔗 URLs Found: ${data.urls.length}</h3>
+                        ${data.urls.length ? data.urls.map(url => `<div class="url-display">${url}</div>`).join('') : '<p>No URLs detected</p>'}
+                    </div>
+
+                    <div class="info-card">
+                        <h3>⚠️ Urgency/Phishing Keywords: ${data.urgencyWords.length}</h3>
+                        <p>${data.urgencyWords.join(', ') || 'None detected'}</p>
+                    </div>
+
+                    <h3>🚩 Flagged Content:</h3>
+                    ${data.flaggedSections.length
+                        ? data.flaggedSections.map(f => `
+                            <div class="risk-factor">
+                                <strong>${f.reason}</strong><br>
+                                ${f.text.substring(0,200)}...
+                                <br><small>Similarity: ${f.similarity}%</small>
+                            </div>
+                          `).join('')
+                        : '<div class="success">✅ No plagiarized content detected</div>'
+                    }
+
+                    <h3>📄 Full Document (with highlights):</h3>
+                    <pre>${highlightedText}</pre>
+                `;
+            } catch (err) {
+                console.error("Error:", err);
+                fileResults.innerHTML = `<div class="error">❌ Server error. Please check the console.</div>`;
+            }
+        });
+
+        // URL analysis
+        async function analyzeURL() {
+            const urlInput = document.getElementById('urlInput');
+            const urlResults = document.getElementById('urlResults');
+            const url = urlInput.value.trim();
+
+            if (!url) {
+                urlResults.innerHTML = '<div class="error">❌ Please enter a URL</div>';
+                return;
+            }
+
+            urlResults.innerHTML = "<div class='loading'>🔍 Analyzing URL... Please wait...</div>";
+
+            try {
+                const res = await fetch('/analyze-url', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await res.json();
+
+                if (data.error) {
+                    urlResults.innerHTML = `<div class="error">❌ ${data.error}</div>`;
+                    return;
+                }
+
+                const statusClass = data.status === 'PHISHING' ? 'status-phishing' : 
+                                   data.status === 'SUSPICIOUS' ? 'status-suspicious' : 'status-safe';
+                
+                const riskClass = data.riskScore >= 60 ? 'risk-high' : 
+                                 data.riskScore >= 30 ? 'risk-medium' : 'risk-low';
+
+                let statusIcon = data.status === 'PHISHING' ? '🚨' : 
+                                data.status === 'SUSPICIOUS' ? '⚠️' : '✅';
+
+                urlResults.innerHTML = `
+                    <h2>🔍 URL Analysis Results</h2>
+                    
+                    <div class="url-display">${data.url}</div>
+                    
+                    <div style="text-align: center; margin: 30px 0;">
+                        <div class="status-badge ${statusClass}">${statusIcon} ${data.status}</div>
+                        <div class="risk-score ${riskClass}">${data.riskScore}/100</div>
+                        <p style="color: #666;">Risk Score</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>🌐 Domain Information</h3>
+                        <div class="domain-info">${data.domain}</div>
+                    </div>
+
+                    <h3>📋 Risk Factors:</h3>
+                    ${data.riskFactors.map(factor => {
+                        if (factor.startsWith('✅')) {
+                            return `<div class="success">${factor}</div>`;
+                        }
+                        return `<div class="risk-factor">⚠️ ${factor}</div>`;
+                    }).join('')}
+
+                    <div style="margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 10px;">
+                        <h4>💡 Recommendation:</h4>
+                        <p style="margin-top: 10px;">
+                            ${data.status === 'PHISHING' ? 
+                                '<strong style="color: #f44336;">🚨 DO NOT visit this website!</strong> This URL shows multiple signs of being a phishing attempt. Avoid entering any personal information.' :
+                              data.status === 'SUSPICIOUS' ?
+                                '<strong style="color: #ff9800;">⚠️ Exercise caution.</strong> This URL has some suspicious characteristics. Verify the legitimacy before proceeding.' :
+                                '<strong style="color: #4caf50;">✅ This URL appears safe</strong> based on the analysis. However, always remain vigilant online.'}
+                        </p>
+                    </div>
+                `;
+            } catch (err) {
+                console.error("Error:", err);
+                urlResults.innerHTML = `<div class="error">❌ Failed to analyze URL. Please try again.</div>`;
+            }
+        }
+
+        // Allow Enter key to trigger URL analysis
+        document.getElementById('urlInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                analyzeURL();
+            }
+        });
+    </script>
+</body>
+</html>
